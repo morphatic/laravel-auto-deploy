@@ -22,7 +22,7 @@ class AutoDeployServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerConfig();
-        $this->registerDeployInitCommand();
+        $this->registerDeployCommands();
         $this->registerDeployController();
     }
 
@@ -34,13 +34,18 @@ class AutoDeployServiceProvider extends ServiceProvider
         ]);
     }
 
-    private function registerDeployInitCommand()
+    private function registerDeployCommands()
     {
         $this->app->singleton('command.morphatic.deployinit', function ($app) {
             return $app['Morphatic\AutoDeploy\Commands\DeployInitCommand'];
         });
 
+        $this->app->singleton('command.morphatic.deployinfo', function ($app) {
+            return $app['Morphatic\AutoDeploy\Commands\DeployInfoCommand'];
+        });
+
         $this->commands('command.morphatic.deployinit');
+        $this->commands('command.morphatic.deployinfo');
     }
 
     private function registerDeployController()
