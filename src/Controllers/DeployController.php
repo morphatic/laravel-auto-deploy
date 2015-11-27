@@ -14,5 +14,14 @@ class DeployController extends Controller
      */
     public function index(Request $request)
     {
+        // which event are we handling?
+         switch ($request->header('X-Github-Event')) {
+            case 'release':
+                break;
+            case 'push':
+                break;
+            case 'create':
+                break;
+        }
     }
 }

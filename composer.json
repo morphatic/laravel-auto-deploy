@@ -22,5 +22,11 @@
             "Morphatic\\AutoDeploy\\": "src/"
         }
     },
+    "scripts": {
+        "post-install-cmd": [
+            "php artisan vendor:publish",
+            "php artisan deploy:init"
+        ]
+    },
     "minimum-stability": "dev"
 }

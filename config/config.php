@@ -12,4 +12,10 @@ return [
 
     'secret' => env('AUTODEPLOY_SECRET', null),
     'route' => env('AUTODEPLOY_ROUTE', null),
+
+    'events' => [
+        'push' => [],
+        'create' => [],
+        'release' => [],
+    ],
 ];

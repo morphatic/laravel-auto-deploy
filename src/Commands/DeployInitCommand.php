@@ -2,6 +2,7 @@
 
 namespace Morphatic\AutoDeploy\Commands;
 
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -42,7 +43,7 @@ class DeployInitCommand extends Command
             $env_content = file_get_contents($path);
 
             // check to see if the autodeploy secret has been set
-            if (false !== str_pos($env_content, 'AUTODEPLOY_SECRET=')) {
+            if (false !== strpos($env_content, 'AUTODEPLOY_SECRET=')) {
                 // it exists already, overwrite it
                 // TODO: confirm overwrite; add --force option?
                 file_put_contents($path, str_replace(
@@ -59,7 +60,7 @@ class DeployInitCommand extends Command
             $env_content = file_get_contents($path);
 
             // check to see if the autodeploy route has been set
-            if (false !== str_pos($env_content, 'AUTODEPLOY_ROUTE=')) {
+            if (false !== strpos($env_content, 'AUTODEPLOY_ROUTE=')) {
                 // it exists already, overwrite it
                 // TODO: confirm overwrite; add --force option?
                 file_put_contents($path, str_replace(
@@ -79,7 +80,11 @@ class DeployInitCommand extends Command
         $this->laravel['config']['auto-deploy.secret'] = $secret;
         $this->laravel['config']['auto-deploy.route'] = $route;
 
-        $this->info("Autodeploy secret [$secret] and route [$route] set successfully.");
+        $this->info(
+            "Here is the information you'll need to set up your webhook at Github:\n\n
+            Payload URL: https://yourdomain.com/$route\n
+            Secret: $secret\n\n
+            You can display this information again by running `php artisan deploy:info`\n");
     }
 
     /**

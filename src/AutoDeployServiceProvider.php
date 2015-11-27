@@ -2,6 +2,7 @@
 
 namespace Morphatic\AutoDeploy;
 
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
 
 class AutoDeployServiceProvider extends ServiceProvider
@@ -9,9 +10,10 @@ class AutoDeployServiceProvider extends ServiceProvider
     /**
      * Bootstrap the application services.
      */
-    public function boot()
+    public function boot(Kernel $kernel)
     {
-        //
+        $this->registerMiddleware($kernel);
+        $this->registerRoutes();
     }
 
     /**
@@ -21,7 +23,7 @@ class AutoDeployServiceProvider extends ServiceProvider
     {
         $this->registerConfig();
         $this->registerDeployInitCommand();
-        $this->registerRoutes();
+        $this->registerDeployController();
     }
 
     private function registerConfig()
@@ -41,11 +43,23 @@ class AutoDeployServiceProvider extends ServiceProvider
         $this->commands('command.morphatic.deployinit');
     }
 
+    private function registerDeployController()
+    {
+        $this->app->make('Morphatic\AutoDeploy\Controllers\DeployController');
+    }
+
+    private function registerMiddleware(Kernel $kernel)
+    {
+        // add our middleware at the beginning, before CSRF checking
+        $kernel->prependMiddleware(Middleware\VerifyDeployRequest::class);
+    }
+
     private function registerRoutes()
     {
         // only register routes if the secret route has been set
-        if (!empty(config('auto-deploy.route'))) {
-            include_once __DIR__.'routes.php';
+        if (!empty($this->app['config']->get('auto-deploy.route'))) {
+            // register the route
+            include_once __DIR__.'/routes.php';
         } else {
             // throw an exception? display a warning?
         }
