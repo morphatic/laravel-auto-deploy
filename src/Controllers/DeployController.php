@@ -19,6 +19,9 @@ class DeployController extends Controller
             case 'release':
                 break;
             case 'push':
+                $event = config('auto-deploy.events.push');
+                foreach ($event as $step) {
+                }
                 break;
             case 'create':
                 break;
