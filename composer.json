@@ -18,6 +18,12 @@
         "orchestra/testbench": "~3.1",
         "satooshi/php-coveralls": "dev-master"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/morphatic/php-coveralls"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "Morphatic\\AutoDeploy\\": "src/"
