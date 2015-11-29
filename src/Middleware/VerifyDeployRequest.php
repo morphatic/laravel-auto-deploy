@@ -11,7 +11,7 @@ class VerifyDeployRequest
     public function __construct()
     {
         foreach (config('auto-deploy.origins') as $origin) {
-            $type = "\Morphatic\AutoDeploy\Origins\$origin";
+            $type = "\Morphatic\AutoDeploy\Origins\\$origin";
             $this->origins[$origin] = new $type();
         }
     }

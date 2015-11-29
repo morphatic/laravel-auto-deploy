@@ -2,8 +2,6 @@
 
 namespace Morphatic\AutoDeploy\Origins;
 
-use AbstractOrigin;
-
 class Github extends AbstractOrigin
 {
     /**
@@ -18,7 +16,7 @@ class Github extends AbstractOrigin
         // Correct IP range for Github maintained here:
         // https://help.github.com/articles/what-ip-addresses-does-github-use-that-i-should-whitelist/
         $has_github_header = false !== strpos($request->header('User-Agent'), 'GitHub-Hookshot');
-        $has_github_ip = $this->ipInRange($_SERVER['REMOTE_ADDR'], '192.30.252.0', 22);
+        $has_github_ip = $this->ipInRange($request->server('REMOTE_ADDR'), '192.30.252.0', 22);
         if ($has_github_header && $has_github_ip) {
             return true;
         }
@@ -35,7 +33,7 @@ class Github extends AbstractOrigin
      *
      * @return bool Returns true if the request is authentic. False otherwise.
      */
-    private function verify($request)
+    public function verify($request)
     {
         // get the Github signature
         $xhub = $request->header('X-Hub-Signature');

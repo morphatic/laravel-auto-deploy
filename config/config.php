@@ -10,7 +10,7 @@ return [
      |
      */
 
-    'requre-ssl' => true,
+    'require-ssl' => true,
     'secret' => env('AUTODEPLOY_SECRET'),
     'route' => env('AUTODEPLOY_ROUTE'),
     'origins' => [
