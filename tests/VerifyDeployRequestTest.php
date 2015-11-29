@@ -1,6 +1,6 @@
 <?php
 
-use Orchestra\Testbench\Testcase;
+use Orchestra\Testbench\TestCase;
 
 class VerifyDeployRequestTest extends TestCase
 {
