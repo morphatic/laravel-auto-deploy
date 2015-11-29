@@ -33,9 +33,6 @@ abstract class AbstractOrigin
      */
     protected function ipInRange($target_ip, $range_ip, $cidr_mask)
     {
-        if ($cidr_mask <= 0) {
-            return false;
-        }
         $target = sprintf('%032b', ip2long($target_ip));
         $range = sprintf('%032b', ip2long($range_ip));
 
