@@ -2,5 +2,6 @@
 .env.*.php
 .env.php
 .env
-
-/vendor/
+.DS_Store
+/vendor
+/build

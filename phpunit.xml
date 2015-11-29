@@ -11,7 +11,7 @@
      syntaxCheck="false">
 
     <testsuites>
-        <testsuite name="Morphatic AutoDeploy Test Suite">
+        <testsuite name="Morphatic\AutoDeploy Test Suite">
             <directory suffix="Test.php">tests/</directory>
         </testsuite>
     </testsuites>
@@ -22,6 +22,12 @@
     <filter>
         <whitelist>
             <directory suffix=".php">src/</directory>
+            <exclude>
+                <directory>./build</directory>
+            </exclude>
         </whitelist>
     </filter>
+    <logging>
+        <log type="coverage-clover" target="build/logs/clover.xml"/>
+    </logging>
 </phpunit>
