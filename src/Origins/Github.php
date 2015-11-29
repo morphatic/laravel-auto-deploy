@@ -36,7 +36,7 @@ class Github extends AbstractOrigin
     public function verify($request)
     {
         // get the Github signature
-        $xhub = $request->header('X-Hub-Signature');
+        $xhub = $request->header('X-Hub-Signature') ?: 'nothing';
 
         // reconstruct the hash on this side
         $hash = 'sha1='.hash_hmac('sha1', $request->getContent(), config('auto-deploy.secret'));

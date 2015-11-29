@@ -32,8 +32,12 @@ class DeployInitCommand extends Command
         $route = $this->getRandomKey($this->laravel['config']['app.cipher']);
 
         if ($this->option('show')) {
-            return $this->line('<comment>Secret: '.$secret.'</comment>'.
-                               '<comment>Route: /'.$route.'</comment>');
+            return $this->line(
+                "Here is the information you'll need to set up your webhook at Github:\n\n".
+                "Payload URL: https://yourdomain.com/$route\n".
+                "Secret: $secret\n\n".
+                "You can display this information again by running `php artisan deploy:info`\n"
+            );
         }
 
         $path = base_path('.env');
@@ -81,10 +85,11 @@ class DeployInitCommand extends Command
         $this->laravel['config']['auto-deploy.route'] = $route;
 
         $this->info(
-            "Here is the information you'll need to set up your webhook at Github:\n\n
-            Payload URL: https://yourdomain.com/$route\n
-            Secret: $secret\n\n
-            You can display this information again by running `php artisan deploy:info`\n");
+            "Here is the information you'll need to set up your webhook at Github:\n\n".
+            "Payload URL: https://yourdomain.com/$route\n".
+            "Secret: $secret\n\n".
+            "You can display this information again by running `php artisan deploy:info`\n"
+        );
     }
 
     /**
