@@ -6,7 +6,7 @@ php:
 
 before_script:
   - composer self-update
-  - composer require satooshi/php-coveralls:dev-master --prefer-source --no-interaction --dev
+  - composer install
 
 script: phpunit -c phpunit.xml --coverage-text
 
