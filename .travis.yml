@@ -8,7 +8,7 @@ before_script:
   - composer self-update
   - composer update
 
-script: phpunit -c phpunit.xml --coverage-text
+script: phpunit --coverage-text
 
 after_script:
   - php vendor/bin/coveralls -v
