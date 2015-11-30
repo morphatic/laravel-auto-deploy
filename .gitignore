@@ -1,7 +1,5 @@
-/bootstrap/compiled.php
-.env.*.php
-.env.php
-.env
 .DS_Store
+.github_changelog_generator
+composer.lock
 /vendor
 /build

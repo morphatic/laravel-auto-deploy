@@ -6,7 +6,9 @@
     "authors": [
         {
             "name": "Morgan Benton",
-            "email": "morgan.benton@gmail.com"
+            "email": "morgan.benton@gmail.com",
+            "homepage": "http://morphatic.com",
+            "role": "Developer"
         }
     ],
     "require": {
@@ -16,7 +18,8 @@
     "require-dev": {
         "phpunit/phpunit": "~5.0",
         "orchestra/testbench": "~3.1",
-        "satooshi/php-coveralls": "dev-master"
+        "satooshi/php-coveralls": "dev-master",
+        "scrutinizer/ocular": "~1.1"
     },
     "repositories": [
         {
@@ -33,7 +36,13 @@
         "post-install-cmd": [
             "php artisan vendor:publish",
             "php artisan deploy:init"
-        ]
+        ],
+        "test": "phpunit"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
     },
     "minimum-stability": "dev"
 }
