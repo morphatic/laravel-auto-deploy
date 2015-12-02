@@ -13,7 +13,6 @@ matrix:
 
 before_script:
   - mkdir -p build/www
-  - chown 777 build/www
   - travis_retry composer self-update
   - travis_retry composer update --no-interaction --prefer-source
 
