@@ -4,6 +4,22 @@ use Orchestra\Testbench\TestCase;
 
 class VerifyDeployRequestTest extends TestCase
 {
+    public function tearDown()
+    {
+        \Mockery::close();
+    }
+
+    protected function getExec($n)
+    {
+        // mock the shell exec class's run method
+        $exec = \Mockery::mock('AdamBrett\ShellWrapper\Runners\Exec');
+        $exec->shouldReceive('run')->times($n)->andReturn('last line of output');
+        $exec->shouldReceive('getOutput')->times($n)->andReturn(['output line 1', 'output line 2']);
+        $exec->shouldReceive('getReturnValue')->times($n)->andReturn(0);
+
+        return $exec;
+    }
+
     protected function getPackageProviders($app)
     {
         return ['Morphatic\AutoDeploy\AutoDeployServiceProvider'];
@@ -16,10 +32,27 @@ class VerifyDeployRequestTest extends TestCase
         $app['config']->set('auto-deploy', $config);
         $app['config']->set('auto-deploy.secret', 'yOq5C0gTCvl0hAWZZhQy5bqc8EQQqHjr');
         $app['config']->set('auto-deploy.route', 'D72lZY0W1qf4dlvWDVT1bSz2etDWqU7j');
+        $app['config']->set('auto-deploy.TestVerified', [
+                'push' => [
+                    'webroot' => dirname(__DIR__).'/build/www/mysite.com',
+                    'steps' => [
+                        'backupDatabase',
+                        'pull',
+                        'composer',
+                        'npm',
+                        'migrate',
+                        'seed',
+                        'deploy',
+                    ],
+                ],
+            ]
+        );
 
         // Add our UnverifiedOrigin and VerifiedOrigin classes to the list of origins
         include_once 'tests/classes/UnverifiedOrigin.php';
         include_once 'tests/classes/VerifiedOrigin.php';
+        $app->bind('Morphatic\AutoDeploy\Origins\OriginInterface', 'Morphatic\AutoDeploy\Origins\UnverifiedOrigin');
+        $app->bind('Morphatic\AutoDeploy\Origins\OriginInterface', 'Morphatic\AutoDeploy\Origins\VerifiedOrigin');
         $origins = $app['config']->get('auto-deploy.origins');
         $origins[] = 'UnverifiedOrigin';
         $origins[] = 'VerifiedOrigin';
@@ -61,6 +94,7 @@ class VerifyDeployRequestTest extends TestCase
     {
         $uri = $this->app['url']->route('autodeployroute', []);
         $this->call('POST', $uri);
+        $this->assertResponseStatus(403);
     }
 
     /**
@@ -90,12 +124,19 @@ class VerifyDeployRequestTest extends TestCase
 
     public function testVerifiedOrigin()
     {
+        App::instance('AdamBrett\ShellWrapper\Runners\Exec', $this->getExec(9));
         $server = [
             'HTTP_ORIGIN' => 'Verified-Webhook',
+            'HTTP_Event-Type' => 'push',
         ];
         $uri = $this->app['url']->route('autodeployroute', []);
         $uri = str_replace('http', 'https', $uri);
         $response = $this->call('POST', $uri, [], [], [], $server);
         $this->assertResponseOk();
+        $controller = new ReflectionObject($this->app['Morphatic\AutoDeploy\Controllers\DeployController']);
+        $origin = $controller->getProperty('origin');
+        $origin->setAccessible(true);
+        $origin = $origin->getValue($this->app['Morphatic\AutoDeploy\Controllers\DeployController']);
+        $this->assertEquals('Morphatic\AutoDeploy\Origins\VerifiedOrigin', get_class($origin));
     }
 }

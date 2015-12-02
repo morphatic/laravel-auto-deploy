@@ -23,6 +23,7 @@ class AutoDeployServiceProvider extends ServiceProvider
     {
         $this->registerConfig();
         $this->registerDeployCommands();
+        $this->registerDeployOrigins();
         $this->registerDeployController();
     }
 
@@ -46,6 +47,14 @@ class AutoDeployServiceProvider extends ServiceProvider
 
         $this->commands('command.morphatic.deployinit');
         $this->commands('command.morphatic.deployinfo');
+    }
+
+    private function registerDeployOrigins()
+    {
+        $origin_types = ['Github'];
+        foreach ($origin_types as $ot) {
+            $this->app->bind('Morphatic\AutoDeploy\Origins\OriginInterface', 'Morphatic\AutoDeploy\Origins\\'.$ot);
+        }
     }
 
     private function registerDeployController()

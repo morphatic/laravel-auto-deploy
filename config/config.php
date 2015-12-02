@@ -11,21 +11,48 @@ return [
      */
 
     'require-ssl' => true,
+    'notify' => 'morgan.benton@gmail.com',
     'secret' => env('AUTODEPLOY_SECRET'),
     'route' => env('AUTODEPLOY_ROUTE'),
     'origins' => [
         'Github',
     ],
-    'servers' => [
-        'staging' => [],
-        'production' => [
-            'app_dir' => '/var/www/portphil.io/',
+    'Github' => [
+        'push' => [
+            'webroot' => '/var/www/staging.mysite.com',
+            'steps' => [
+                'backupDatabase',
+                'pull',
+                'composer',
+                'npm',
+                'migrate',
+                'seed',
+                'deploy',
+            ],
         ],
-    ],
-
-    'events' => [
-        'push' => [],
-        'create' => [],
-        'release' => [],
+        'create' => [
+            'webroot' => '/var/www/staging.mysite.com',
+            'steps' => [
+                'backupDatabase',
+                'pull',
+                'composer',
+                'npm',
+                'migrate',
+                'seed',
+                'deploy',
+            ],
+        ],
+        'release' => [
+            'webroot' => '/var/www/mysite.com',
+            'steps' => [
+                'backupDatabase',
+                'pull',
+                'composer',
+                'npm',
+                'migrate',
+                'seed',
+                'deploy',
+            ],
+        ],
     ],
 ];

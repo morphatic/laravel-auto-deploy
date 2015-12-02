@@ -12,7 +12,9 @@ class AutoDeployCommandsTest extends TestCase
     public static function tearDownAfterClass()
     {
         $env_file = base_path('.env');
-        unlink($env_file);
+        if (file_exists($env_file)) {
+            unlink($env_file);
+        }
     }
 
     protected function getEnvironmentSetup($app)

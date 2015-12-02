@@ -3,16 +3,17 @@
 namespace Morphatic\AutoDeploy\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 
 class VerifyDeployRequest
 {
     protected $origins = [];
 
-    public function __construct()
+    public function __construct(Request $request)
     {
         foreach (config('auto-deploy.origins') as $origin) {
             $type = "\Morphatic\AutoDeploy\Origins\\$origin";
-            $this->origins[$origin] = new $type();
+            $this->origins[$origin] = new $type($request);
         }
     }
 
@@ -20,9 +21,12 @@ class VerifyDeployRequest
     {
         if ($request->path() === config('auto-deploy.route')) {
             if (!config('auto-deploy.require-ssl') || $request->secure()) {
-                $origin = $this->determineOrigin($request);
+                $origin = $this->determineOrigin();
                 if (null !== $origin) {
-                    if ($origin->verify($request)) {
+                    if ($origin->verify()) {
+                        // set the origin type in the controller
+                        $request->offsetSet('origin', $origin);
+
                         return $next($request);
                     } else {
                         abort(403, 'Forbidden. Could not verify the origin of the request.');
@@ -45,10 +49,10 @@ class VerifyDeployRequest
      *
      * @return \Morphatic\AutoDeploy\Origins\OriginInterface An object corresponding to the origin type or null.
      */
-    private function determineOrigin($request)
+    private function determineOrigin()
     {
         foreach ($this->origins as $origin) {
-            if ($origin->originated($request)) {
+            if ($origin->originated()) {
                 return $origin;
             }
         }
