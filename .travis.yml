@@ -15,4 +15,4 @@ script: ./vendor/bin/phpunit -c phpunit.xml --coverage-text
 
 after_script:
   - php vendor/bin/coveralls -v
-  - if [[ $TRAVIS_PHP_VERSION != '7.0' ]]; then php vendor/bin/ocular code-coverage:upload --format=php-clover build/logs/clover.xml; fi
+  - php vendor/bin/ocular code-coverage:upload --format=php-clover build/logs/clover.xml

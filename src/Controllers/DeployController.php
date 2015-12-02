@@ -72,6 +72,12 @@ class DeployController extends Controller
      */
     private $result;
 
+    /**
+     * Create a new DeployController instance.
+     *
+     * @param Morphatic\AutoDeploy\Origins\OriginInterface $origin The origin of the webhook
+     * @param AdamBrett\ShellWrapper\Runners\Exec          $exec   The shell command execution class
+     */
     public function __construct(OriginInterface $origin, Exec $exec)
     {
         // set class variables related to the webhook origin
@@ -85,10 +91,8 @@ class DeployController extends Controller
 
     /**
      * Handles incoming webhook requests.
-     *
-     * @param Request $request The payload from the webhook origin, e.g. Github
      */
-    public function index(Request $request)
+    public function index()
     {
         // get the parameters for the event we're handling
         $config_key = "auto-deploy.{$this->origin->name}.{$this->origin->event()}";
@@ -113,8 +117,9 @@ class DeployController extends Controller
             'Timestamp' => date('r'),
             'output' => '',
         ];
+        $whitelist = ['backupDatabase','pull','composer','npm','migrate','seed','deploy'];
         foreach ($steps as $step) {
-            if (!$this->{$step}()) {
+            if (in_array($step, $whitelist) && !$this->{$step}()) {
                 $this->log->error('Deploy failed.', $this->result);
 
                 return;
@@ -133,7 +138,7 @@ class DeployController extends Controller
     private function ex(CommandInterface $cmd)
     {
         // try to run the command
-        $last_line = $this->shell->run($cmd);
+        $this->shell->run($cmd);
         $output = $this->shell->getOutput();
         $return_var = $this->shell->getReturnValue();
 

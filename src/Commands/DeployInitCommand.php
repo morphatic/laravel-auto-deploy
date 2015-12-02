@@ -30,14 +30,14 @@ class DeployInitCommand extends Command
         // generate a secret key and route name
         $secret = $this->getRandomKey($this->laravel['config']['app.cipher']);
         $route = $this->getRandomKey($this->laravel['config']['app.cipher']);
+        $url = parse_url(config('app.url'), PHP_URL_HOST);
+        $msg = "Here is the information you'll need to set up your webhook:\n\n".
+               "Payload URL: <comment>https://$url/{$route[1]}</comment>\n".
+               "Secret: <comment>{$secret[1]}</comment>\n\n".
+               "You can display this information again by running `php artisan deploy:info`\n";
 
         if ($this->option('show')) {
-            return $this->line(
-                "Here is the information you'll need to set up your webhook at Github:\n\n".
-                "Payload URL: https://yourdomain.com/$route\n".
-                "Secret: $secret\n\n".
-                "You can display this information again by running `php artisan deploy:info`\n"
-            );
+            return $this->line($msg);
         }
 
         $path = base_path('.env');
@@ -65,13 +65,15 @@ class DeployInitCommand extends Command
 
             // check to see if the autodeploy route has been set
             if (false !== strpos($env_content, 'AUTODEPLOY_ROUTE=')) {
-                // it exists already, overwrite it
-                // TODO: confirm overwrite; add --force option?
-                file_put_contents($path, str_replace(
-                    'AUTODEPLOY_ROUTE='.$this->laravel['config']['auto-deploy.route'],
-                    'AUTODEPLOY_ROUTE='.$route,
-                    file_get_contents($path)
-                ));
+                // it exists already, overwrite it?
+                if ($this->option('force') ||
+                    $this->confirm('The values have already been set. Do you want to overwrite them? [y|N]')) {
+                    file_put_contents($path, str_replace(
+                        'AUTODEPLOY_ROUTE='.$this->laravel['config']['auto-deploy.route'],
+                        'AUTODEPLOY_ROUTE='.$route,
+                        file_get_contents($path)
+                    ));
+                }
             } else {
                 // doesn't exist yet, so add it
                 file_put_contents($path, $env_content."\n".'AUTODEPLOY_ROUTE='.$route);
@@ -84,12 +86,7 @@ class DeployInitCommand extends Command
         $this->laravel['config']['auto-deploy.secret'] = $secret;
         $this->laravel['config']['auto-deploy.route'] = $route;
 
-        $this->info(
-            "Here is the information you'll need to set up your webhook at Github:\n\n".
-            "Payload URL: https://yourdomain.com/$route\n".
-            "Secret: $secret\n\n".
-            "You can display this information again by running `php artisan deploy:info`\n"
-        );
+        $this->info($msg);
     }
 
     /**
@@ -117,6 +114,7 @@ class DeployInitCommand extends Command
     {
         return [
             ['show', null, InputOption::VALUE_NONE, 'Simply display the secret and route instead of modifying files.'],
+            ['force', null, InputOption::VALUE_NONE, 'Create new keys. Overwrite existing keys if they exist.'],
         ];
     }
 }
