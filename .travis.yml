@@ -12,6 +12,8 @@ matrix:
     - php: 7.0
 
 before_script:
+  - mkdir build/www
+  - chown 777 build/www
   - travis_retry composer self-update
   - travis_retry composer update --no-interaction --prefer-source
 
