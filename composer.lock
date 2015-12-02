@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "45d954cd5ba8f8d5d456b0d8221545b1",
-    "content-hash": "e75c363eedb5b27991506c269a4025fc",
+    "hash": "506836c92eb390b9e01e90054bfbb33a",
+    "content-hash": "eb58ee5fcf3c1ead465c55f13e1db371",
     "packages": [
         {
             "name": "adambrett/shell-wrapper",
@@ -3135,23 +3135,22 @@
         },
         {
             "name": "satooshi/php-coveralls",
-            "version": "v0.6.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/morphatic/php-coveralls.git",
-                "reference": "dd0df95bd37a7cf5c5c50304dfe260ffe4b50760"
+                "reference": "c730f66126736cc7b61020bd7383fc09255850cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/morphatic/php-coveralls/zipball/dd0df95bd37a7cf5c5c50304dfe260ffe4b50760",
-                "reference": "dd0df95bd37a7cf5c5c50304dfe260ffe4b50760",
+                "url": "https://api.github.com/repos/morphatic/php-coveralls/zipball/c730f66126736cc7b61020bd7383fc09255850cf",
+                "reference": "c730f66126736cc7b61020bd7383fc09255850cf",
                 "shasum": ""
             },
             "require": {
-                "ext-curl": "*",
                 "ext-json": "*",
                 "ext-simplexml": "*",
-                "guzzle/guzzle": ">=3.0",
+                "guzzle/guzzle": ">=2.7",
                 "php": ">=5.3",
                 "psr/log": "1.0.0",
                 "symfony/config": ">=2.0",
@@ -3161,7 +3160,7 @@
             },
             "require-dev": {
                 "apigen/apigen": "2.8.*@stable",
-                "pdepend/pdepend": "dev-master",
+                "pdepend/pdepend": "dev-master as 2.0.0",
                 "phpmd/phpmd": "dev-master",
                 "phpunit/php-invoker": ">=1.1.0,<1.2.0",
                 "phpunit/phpunit": "3.7.*@stable",
@@ -3170,14 +3169,22 @@
                 "squizlabs/php_codesniffer": "1.4.*@stable",
                 "theseer/fdomdocument": "dev-master"
             },
+            "suggest": {
+                "symfony/http-kernel": "Allows Symfony integration"
+            },
             "bin": [
                 "composer/bin/coveralls"
             ],
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.7-dev"
+                }
+            },
             "autoload": {
                 "psr-0": {
-                    "Contrib\\Component": "src/",
-                    "Contrib\\Bundle": "src/"
+                    "Satooshi\\Component": "src/",
+                    "Satooshi\\Bundle": "src/"
                 }
             },
             "license": [
@@ -3199,9 +3206,9 @@
                 "test"
             ],
             "support": {
-                "source": "https://github.com/morphatic/php-coveralls/tree/v0.6.1"
+                "source": "https://github.com/morphatic/php-coveralls/tree/master"
             },
-            "time": "2013-05-04 08:07:33"
+            "time": "2015-11-29 02:35:37"
         },
         {
             "name": "scrutinizer/ocular",
@@ -3852,7 +3859,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "satooshi/php-coveralls": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
