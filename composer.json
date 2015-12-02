@@ -20,7 +20,7 @@
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "~5.0",
         "orchestra/testbench": "~3.1",
-        "satooshi/php-coveralls": "dev-master",
+        "satooshi/php-coveralls": "0.7.x-dev",
         "scrutinizer/ocular": "~1.1"
     },
     "repositories": [

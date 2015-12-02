@@ -139,4 +139,60 @@ class VerifyDeployRequestTest extends TestCase
         $origin = $origin->getValue($this->app['Morphatic\AutoDeploy\Controllers\DeployController']);
         $this->assertEquals('Morphatic\AutoDeploy\Origins\VerifiedOrigin', get_class($origin));
     }
+
+    public function testPgsql($value = '')
+    {
+        $this->app['config']->set('database.default', 'pgsql');
+        App::instance('AdamBrett\ShellWrapper\Runners\Exec', $this->getExec(9));
+        $server = [
+            'HTTP_ORIGIN' => 'Verified-Webhook',
+            'HTTP_Event-Type' => 'push',
+        ];
+        $uri = $this->app['url']->route('autodeployroute', []);
+        $uri = str_replace('http', 'https', $uri);
+        $response = $this->call('POST', $uri, [], [], [], $server);
+        $this->assertResponseOk();
+    }
+
+    public function testSqlite($value = '')
+    {
+        $this->app['config']->set('database.default', 'sqlite');
+        App::instance('AdamBrett\ShellWrapper\Runners\Exec', $this->getExec(9));
+        $server = [
+            'HTTP_ORIGIN' => 'Verified-Webhook',
+            'HTTP_Event-Type' => 'push',
+        ];
+        $uri = $this->app['url']->route('autodeployroute', []);
+        $uri = str_replace('http', 'https', $uri);
+        $response = $this->call('POST', $uri, [], [], [], $server);
+        $this->assertResponseOk();
+    }
+
+    public function testDbBackupFail($value = '')
+    {
+        $this->app['config']->set('database.default', 'nonexistent');
+        App::instance('AdamBrett\ShellWrapper\Runners\Exec', $this->getExec(1));
+        $server = [
+            'HTTP_ORIGIN' => 'Verified-Webhook',
+            'HTTP_Event-Type' => 'push',
+        ];
+        $uri = $this->app['url']->route('autodeployroute', []);
+        $uri = str_replace('http', 'https', $uri);
+        $response = $this->call('POST', $uri, [], [], [], $server);
+        $this->assertResponseOk();
+    }
+
+    public function testPullFail($value = '')
+    {
+        $this->app['config']->set('auto-deploy.TestVerified.push.webroot', '/this/dir/does/not/exist');
+        App::instance('AdamBrett\ShellWrapper\Runners\Exec', $this->getExec(2));
+        $server = [
+            'HTTP_ORIGIN' => 'Verified-Webhook',
+            'HTTP_Event-Type' => 'push',
+        ];
+        $uri = $this->app['url']->route('autodeployroute', []);
+        $uri = str_replace('http', 'https', $uri);
+        $response = $this->call('POST', $uri, [], [], [], $server);
+        $this->assertResponseOk();
+    }
 }
