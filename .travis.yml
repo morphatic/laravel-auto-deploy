@@ -3,13 +3,8 @@ language: php
 php:
   - 5.6
   - 7.0
-  - hhvm-nightly
 
 sudo: false
-
-matrix:
-  allow_failures:
-    - php: 7.0
 
 before_script:
   - mkdir -p build/www
@@ -20,4 +15,4 @@ script: ./vendor/bin/phpunit -c phpunit.xml --coverage-text
 
 after_script:
   - php vendor/bin/coveralls -v
-  - if [[ $TRAVIS_PHP_VERSION != 'hhvm' && $TRAVIS_PHP_VERSION != '7.0' ]]; then php vendor/bin/ocular code-coverage:upload --format=php-clover build/logs/clover.xml; fi
+  - if [[ $TRAVIS_PHP_VERSION != '7.0' ]]; then php vendor/bin/ocular code-coverage:upload --format=php-clover build/logs/clover.xml; fi
