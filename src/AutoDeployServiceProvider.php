@@ -37,11 +37,11 @@ class AutoDeployServiceProvider extends ServiceProvider
 
     private function registerDeployCommands()
     {
-        $this->app->singleton('command.morphatic.deployinit', function ($app) {
+        $this->app->singleton('command.morphatic.deployinit', function($app) {
             return $app['Morphatic\AutoDeploy\Commands\DeployInitCommand'];
         });
 
-        $this->app->singleton('command.morphatic.deployinfo', function ($app) {
+        $this->app->singleton('command.morphatic.deployinfo', function($app) {
             return $app['Morphatic\AutoDeploy\Commands\DeployInfoCommand'];
         });
 
