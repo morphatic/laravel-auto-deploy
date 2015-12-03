@@ -4,6 +4,13 @@ use Orchestra\Testbench\TestCase;
 
 class AutoDeployCommandsTest extends TestCase
 {
+    /**
+     * Template for messages to be returned from deploy commands.
+     *
+     * @var string
+     */
+    private $msg;
+
     protected function getPackageProviders($app)
     {
         return ['Morphatic\AutoDeploy\AutoDeployServiceProvider'];
@@ -22,70 +29,71 @@ class AutoDeployCommandsTest extends TestCase
         // Setup default config
         $config = include 'config/config.php';
         $app['config']->set('auto-deploy', $config);
+        $url = parse_url($app['config']->get('app.url'), PHP_URL_HOST);
+        $this->msg = "Here is the information you'll need to set up your webhooks:\n\n".
+                     "  Payload URL: https://$url/%s\n".
+                     "  Secret Key:  %s\n\n".
+                     "You can display this information again by running `php artisan deploy:info`\n\n";
     }
 
+    /*
     public function testDeployInfoBeforeInit()
     {
-        $code = $this->artisan('deploy:info');
+        $code = $this->artisan('deploy:info', ['--no-interaction' => true]);
         $info = $this->app['Illuminate\Contracts\Console\Kernel']->output();
+        $route = $this->app['config']->get('auto-deploy.route');
+        $secret = $this->app['config']->get('auto-deploy.secret');
         $this->assertEquals(0, $code);
-        $this->assertEquals("You need to run `php artisan deploy:init` first.\n", $info);
+        $msg = " You don't have any values to show yet. Would you like to create them now? (yes/no) [yes]:\n>\n";
+        $this->assertEquals($msg.sprintf($this->msg, $route, $secret), $info);
     }
+    */
 
     public function testDeployInit()
     {
-        $code = $this->artisan('deploy:init');
+        $code = $this->artisan('deploy:init', ['--no-interaction' => true]);
         $info = $this->app['Illuminate\Contracts\Console\Kernel']->output();
-        $secret = config('auto-deploy.secret');
-        $route = config('auto-deploy.route');
-        $msg = "Here is the information you'll need to set up your webhook at Github:\n\n".
-               "Payload URL: https://yourdomain.com/$route\n".
-               "Secret: $secret\n\n".
-               "You can display this information again by running `php artisan deploy:info`\n\n";
+        $route = $this->app['config']->get('auto-deploy.route');
+        $secret = $this->app['config']->get('auto-deploy.secret');
         $this->assertEquals(0, $code);
-        $this->assertEquals($msg, $info);
-
-        return [$secret, $route];
+        $this->assertEquals(sprintf($this->msg, $route, $secret), $info);
     }
 
-    /**
-     * @depends testDeployInit
-     */
-    public function testDeployInfoAfterInit($args)
+    public function testDeployInfoAfterInit()
     {
-        $code = $this->artisan('deploy:info');
+        $code = $this->artisan('deploy:info', ['--no-interaction' => true]);
         $info = $this->app['Illuminate\Contracts\Console\Kernel']->output();
-        $msg = "Here is the information you'll need to set up your webhook at Github:\n\n".
-               "Payload URL: https://yourdomain.com/{$args[1]}\n".
-               "Secret: {$args[0]}\n\n".
-               "You can display this information again by running `php artisan deploy:info`\n\n";
+        $route = $this->app['config']->get('auto-deploy.route');
+        $secret = $this->app['config']->get('auto-deploy.secret');
         $this->assertEquals(0, $code);
-        $this->assertEquals($msg, $info);
+        $this->assertEquals(sprintf($this->msg, $route, $secret), $info);
     }
 
     public function testDeployInitShow()
     {
         $code = $this->artisan('deploy:init', ['--show' => true]);
         $info = $this->app['Illuminate\Contracts\Console\Kernel']->output();
-        $msg = "~Here is the information you'll need to set up your webhook at Github:\n\n".
-               "Payload URL: https://yourdomain.com/\S+\n".
-               "Secret: \S+\n\n".
-               "You can display this information again by running `php artisan deploy:info`\n\n~";
+        $route = $this->app['config']->get('auto-deploy.route');
+        $secret = $this->app['config']->get('auto-deploy.secret');
         $this->assertEquals(0, $code);
-        $this->assertRegExp($msg, $info);
+        $this->assertEquals(sprintf($this->msg, $route, $secret), $info);
     }
 
-    public function testDeployReInit()
+    public function testDeployInitForce()
     {
-        $code = $this->artisan('deploy:init');
+        $code = $this->artisan('deploy:init', ['--force' => true]);
         $info = $this->app['Illuminate\Contracts\Console\Kernel']->output();
-        $secret = config('auto-deploy.secret');
-        $route = config('auto-deploy.route');
-        $msg = "Here is the information you'll need to set up your webhook at Github:\n\n".
-               "Payload URL: https://yourdomain.com/$route\n".
-               "Secret: $secret\n\n".
-               "You can display this information again by running `php artisan deploy:info`\n\n";
+        $route = $this->app['config']->get('auto-deploy.route');
+        $secret = $this->app['config']->get('auto-deploy.secret');
         $this->assertEquals(0, $code);
-        $this->assertEquals($msg, $info);
+        $this->assertEquals(sprintf($this->msg, $route, $secret), $info);
+    }
+
+    public function testDeployInitForceShow()
+    {
+        $code = $this->artisan('deploy:init', ['--force' => true, '--show' => true]);
+        $info = $this->app['Illuminate\Contracts\Console\Kernel']->output();
+        $this->assertEquals(0, $code);
+        $this->assertEquals("You can't use --force and --show together!\n", $info);
     }
 }
