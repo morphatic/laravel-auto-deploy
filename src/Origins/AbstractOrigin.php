@@ -28,25 +28,19 @@ abstract class AbstractOrigin implements OriginInterface
     /**
      * Determines whether or not the Request originated from the webhook origin.
      *
-     * @param Illuminate\Http\Request $request The Request object
-     *
      * @return bool Returns true if the request originated from this origin. False otherwise.
      */
-    abstract public function originated();
+    abstract public function isOrigin();
 
     /**
      * Verifies the authenticity of a webhook request from the origin.
      *
-     * @param Illuminate\Http\Request $request The Request object
-     *
      * @return bool Returns true if the request is authentic. False otherwise.
      */
-    abstract public function verify();
+    abstract public function isAuthentic();
 
     /**
      * Gets the event the triggered the webhook request.
-     *
-     * @param Illuminate\Http\Request $request The Request object
      *
      * @return string The name of the event, e.g. push, release, create, etc.
      */
@@ -55,16 +49,12 @@ abstract class AbstractOrigin implements OriginInterface
     /**
      * Gets the URL to be cloned from.
      *
-     * @param Illuminate\Http\Request $request The Request object
-     *
      * @return string The URL of the repo.
      */
     abstract public function getRepoUrl();
 
     /**
      * Gets the ID of the commit that is to be cloned.
-     *
-     * @param Illuminate\Http\Request $request The Request object
      *
      * @return string The commit ID.
      */
@@ -73,17 +63,17 @@ abstract class AbstractOrigin implements OriginInterface
     /**
      * Determines if a target IP address is within a particular IP address range.
      *
-     * @param string $target_ip The IP address to check
-     * @param string $range_ip  The IP address defining the range
-     * @param int    $cidr_mask The CIDR notation net mask defining the range
+     * @param string $targetIp The IP address to check
+     * @param string $rangeIp  The IP address defining the range
+     * @param int    $cidrMask The CIDR notation net mask defining the range
      *
      * @return bool True if the target IP falls within the specified range. Otherwise false.
      */
-    protected function ipInRange($target_ip, $range_ip, $cidr_mask)
+    protected function isIpInRange($targetIp, $rangeIp, $cidrMask)
     {
-        $target = sprintf('%032b', ip2long($target_ip));
-        $range = sprintf('%032b', ip2long($range_ip));
+        $target = sprintf('%032b', ip2long($targetIp));
+        $range = sprintf('%032b', ip2long($rangeIp));
 
-        return 0 === substr_compare($target, $range, 0, $cidr_mask);
+        return 0 === substr_compare($target, $range, 0, $cidrMask);
     }
 }

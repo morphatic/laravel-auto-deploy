@@ -28,7 +28,7 @@ class DeployController extends Controller
      *
      * @var string
      */
-    private $repo_url;
+    private $repoUrl;
 
     /**
      * The absolute path of the directory on the server that contains the project.
@@ -42,7 +42,7 @@ class DeployController extends Controller
      *
      * @var string
      */
-    private $install_dir;
+    private $installDir;
 
     /**
      * A log of the results of the entire deploy process.
@@ -56,7 +56,7 @@ class DeployController extends Controller
      *
      * @var string
      */
-    private $commit_id;
+    private $commitId;
 
     /**
      * The commit ID for this commit.
@@ -82,8 +82,8 @@ class DeployController extends Controller
     {
         // set class variables related to the webhook origin
         $this->origin = $origin;
-        $this->repo_url = $this->origin->getRepoUrl();
-        $this->commit_id = $this->origin->getCommitId();
+        $this->repoUrl = $this->origin->getRepoUrl();
+        $this->commitId = $this->origin->getCommitId();
 
         // create an instance of the shell exec
         $this->shell = $exec;
@@ -95,10 +95,10 @@ class DeployController extends Controller
     public function index()
     {
         // get the parameters for the event we're handling
-        $config_key = "auto-deploy.{$this->origin->name}.{$this->origin->event()}";
-        $this->webroot = config("$config_key.webroot");
-        $this->install_dir = dirname($this->webroot).'/'.date('Y-m-d').'_'.$this->commit_id;
-        $steps = config("$config_key.steps");
+        $configKey = "auto-deploy.{$this->origin->name}.{$this->origin->event()}";
+        $this->webroot = config("$configKey.webroot");
+        $this->installDir = dirname($this->webroot).'/'.date('Y-m-d').'_'.$this->commitId;
+        $steps = config("$configKey.steps");
 
         // set up logging to email
         $domain = parse_url(config('app.url'), PHP_URL_HOST);
@@ -113,7 +113,7 @@ class DeployController extends Controller
 
         // execute the configured steps
         $this->result = [
-            'Commit_ID' => $this->commit_id,
+            'Commit_ID' => $this->commitId,
             'Timestamp' => date('r'),
             'output' => '',
         ];
@@ -140,14 +140,14 @@ class DeployController extends Controller
         // try to run the command
         $this->shell->run($cmd);
         $output = $this->shell->getOutput();
-        $return_var = $this->shell->getReturnValue();
+        $returnValue = $this->shell->getReturnValue();
 
         // record the result
         $output = count($output) ? implode("\n", $output)."\n" : '';
         $this->result['output'] .= "$cmd\n$output";
 
         // return a boolean
-        return 0 === $return_var;
+        return 0 === $returnValue;
     }
 
     /**
@@ -206,17 +206,17 @@ class DeployController extends Controller
      */
     private function pull()
     {
-        if (is_writable(dirname($this->install_dir))) {
+        if (is_writable(dirname($this->installDir))) {
             $cmd = new Command('mkdir');
             $cmd->addFlag('p')
-                ->addParam($this->install_dir);
+                ->addParam($this->installDir);
             if ($this->ex($cmd)) {
                 $cmd = new Command('cd');
-                $cmd->addParam($this->install_dir)
+                $cmd->addParam($this->installDir)
                     ->addSubCommand('&&')
                     ->addSubCommand('git')
                     ->addSubCommand('clone')
-                    ->addParam($this->repo_url)
+                    ->addParam($this->repoUrl)
                     ->addParam('.');
 
                 return $this->ex($cmd);
@@ -234,7 +234,7 @@ class DeployController extends Controller
     private function composer()
     {
         $cmd = new Command('cd');
-        $cmd->addParam($this->install_dir)
+        $cmd->addParam($this->installDir)
             ->addSubCommand('&&')
             ->addSubCommand('composer')
             ->addParam('self-update')
@@ -254,7 +254,7 @@ class DeployController extends Controller
     private function npm()
     {
         $cmd = new Command('cd');
-        $cmd->addParam($this->install_dir)
+        $cmd->addParam($this->installDir)
             ->addSubCommand('&&')
             ->addSubCommand('npm')
             ->addParam('update');
@@ -270,7 +270,7 @@ class DeployController extends Controller
     private function migrate()
     {
         $cmd = new Command('cd');
-        $cmd->addParam($this->install_dir)
+        $cmd->addParam($this->installDir)
             ->addSubCommand('&&')
             ->addSubCommand('php')
             ->addSubCommand('artisan')
@@ -289,7 +289,7 @@ class DeployController extends Controller
     private function seed()
     {
         $cmd = new Command('cd');
-        $cmd->addParam($this->install_dir)
+        $cmd->addParam($this->installDir)
             ->addSubCommand('&&')
             ->addSubCommand('php')
             ->addSubCommand('artisan')
@@ -310,7 +310,7 @@ class DeployController extends Controller
             ->addSubCommand('&&')
             ->addSubCommand('ln')
             ->addFlag('fs')
-            ->addParam($this->install_dir)
+            ->addParam($this->installDir)
             ->addParam($this->webroot);
 
         return $this->ex($cmd);

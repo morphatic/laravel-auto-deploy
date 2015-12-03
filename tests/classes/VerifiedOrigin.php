@@ -11,20 +11,18 @@ class VerifiedOrigin extends AbstractOrigin implements OriginInterface
      */
     public $name = 'TestVerified';
 
-    public function originated()
+    public function isOrigin()
     {
         return 'Verified-Webhook' === $this->request->header('ORIGIN');
     }
 
-    public function verify()
+    public function isAuthentic()
     {
         return true;
     }
 
     /**
      * Gets the event the triggered the webhook request.
-     *
-     * @param Illuminate\Http\Request $this->request The Request object
      *
      * @return string The name of the event, e.g. push, release, create, etc.
      */
@@ -36,8 +34,6 @@ class VerifiedOrigin extends AbstractOrigin implements OriginInterface
     /**
      * Gets the URL to be cloned from.
      *
-     * @param Illuminate\Http\Request $this->request The Request object
-     *
      * @return string The URL of the repo.
      */
     public function getRepoUrl()
@@ -47,8 +43,6 @@ class VerifiedOrigin extends AbstractOrigin implements OriginInterface
 
     /**
      * Gets the ID of the commit that is to be cloned.
-     *
-     * @param Illuminate\Http\Request $this->request The Request object
      *
      * @return string The commit ID.
      */

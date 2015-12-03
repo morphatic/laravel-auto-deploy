@@ -17,13 +17,21 @@ class VerifyDeployRequest
         }
     }
 
+    /**
+     * Handles the HTTP request.
+     *
+     * @param Illuminate\Http\Request $request The request
+     * @param Closure                 $next    Mechanism for passing the result down the pipeline to the next piece of middleware
+     *
+     * @return Illuminate\Http\Response A Response object that is passed to the next piece of middleware
+     */
     public function handle($request, Closure $next)
     {
         if ($request->path() === config('auto-deploy.route')) {
             if (!config('auto-deploy.require-ssl') || $request->secure()) {
                 $origin = $this->determineOrigin();
                 if (null !== $origin) {
-                    if ($origin->verify()) {
+                    if ($origin->isAuthentic()) {
                         // set the origin type in the controller
                         $request->offsetSet('origin', $origin);
 
@@ -45,14 +53,12 @@ class VerifyDeployRequest
     /**
      * Determine the origin of a deploy request.
      *
-     * @param Illuminate\Http\Request $request The Request object.
-     *
      * @return \Morphatic\AutoDeploy\Origins\OriginInterface An object corresponding to the origin type or null.
      */
     private function determineOrigin()
     {
         foreach ($this->origins as $origin) {
-            if ($origin->originated()) {
+            if ($origin->isOrigin()) {
                 return $origin;
             }
         }

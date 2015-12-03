@@ -14,21 +14,16 @@ class Github extends AbstractOrigin implements OriginInterface
     /**
      * Determines whether or not the Request originated from Github.
      *
-     * @param Illuminate\Http\Request $this->request The Request object
-     *
      * @return bool Returns true if the request originated from Github. False otherwise.
      */
-    public function originated()
+    public function isOrigin()
     {
         // Correct IP range for Github maintained here:
         // https://help.github.com/articles/what-ip-addresses-does-github-use-that-i-should-whitelist/
-        $has_github_header = false !== strpos($this->request->header('User-Agent'), 'GitHub-Hookshot');
-        $has_github_ip = $this->ipInRange($this->request->server('REMOTE_ADDR'), '192.30.252.0', 22);
-        if ($has_github_header && $has_github_ip) {
-            return true;
-        }
+        $hasGithubHeader = false !== strpos($this->request->header('User-Agent'), 'GitHub-Hookshot');
+        $hasGithubIp = $this->isIpInRange($this->request->server('REMOTE_ADDR'), '192.30.252.0', 22);
 
-        return false;
+        return $hasGithubHeader && $hasGithubIp;
     }
 
     /**
@@ -36,11 +31,9 @@ class Github extends AbstractOrigin implements OriginInterface
      *
      * Follows the procedure described here: https://developer.github.com/webhooks/securing/
      *
-     * @param Illuminate\Http\Request $this->request The Request object
-     *
      * @return bool Returns true if the request is authentic. False otherwise.
      */
-    public function verify()
+    public function isAuthentic()
     {
         // get the Github signature
         $xhub = $this->request->header('X-Hub-Signature') ?: 'nothing';
@@ -55,8 +48,6 @@ class Github extends AbstractOrigin implements OriginInterface
     /**
      * Gets the event the triggered the webhook request.
      *
-     * @param Illuminate\Http\Request $this->request The Request object
-     *
      * @return string The name of the event, e.g. push, release, create, etc.
      */
     public function event()
@@ -67,8 +58,6 @@ class Github extends AbstractOrigin implements OriginInterface
     /**
      * Gets the URL to be cloned from.
      *
-     * @param Illuminate\Http\Request $request The Request object
-     *
      * @return string The URL of the repo.
      */
     public function getRepoUrl()
@@ -78,8 +67,6 @@ class Github extends AbstractOrigin implements OriginInterface
 
     /**
      * Gets the ID of the commit that is to be cloned.
-     *
-     * @param Illuminate\Http\Request $request The Request object
      *
      * @return string The commit ID.
      */

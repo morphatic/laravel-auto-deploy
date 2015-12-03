@@ -51,8 +51,8 @@ class AutoDeployServiceProvider extends ServiceProvider
 
     private function registerDeployOrigins()
     {
-        $origin_types = ['Github'];
-        foreach ($origin_types as $ot) {
+        $originTypes = ['Github'];
+        foreach ($originTypes as $ot) {
             $this->app->bind('Morphatic\AutoDeploy\Origins\OriginInterface', 'Morphatic\AutoDeploy\Origins\\'.$ot);
         }
     }
