@@ -2,6 +2,12 @@
 
 [![Build Status](https://travis-ci.org/morphatic/laravel-auto-deploy.svg?branch=master)](https://travis-ci.org/morphatic/laravel-auto-deploy) [![Coverage Status](https://coveralls.io/repos/morphatic/laravel-auto-deploy/badge.svg?branch=master&service=github)](https://coveralls.io/github/morphatic/laravel-auto-deploy?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/morphatic/laravel-auto-deploy/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/morphatic/laravel-auto-deploy/?branch=master) [![Dependency Status](https://www.versioneye.com/user/projects/565e842cf376cc003c000001/badge.svg?style=flat)](https://www.versioneye.com/user/projects/565e842cf376cc003c000001) [![Latest Stable Version](https://poser.pugx.org/morphatic/laravel-auto-deploy/v/stable)](https://packagist.org/packages/morphatic/laravel-auto-deploy) [![Total Downloads](https://poser.pugx.org/morphatic/laravel-auto-deploy/downloads)](https://packagist.org/packages/morphatic/laravel-auto-deploy) [![Latest Unstable Version](https://poser.pugx.org/morphatic/laravel-auto-deploy/v/unstable)](https://packagist.org/packages/morphatic/laravel-auto-deploy) [![License](https://poser.pugx.org/morphatic/laravel-auto-deploy/license)](https://packagist.org/packages/morphatic/laravel-auto-deploy)
 
+<div style="color:#a94442;background-color:#f2dede;border: 1px solid #ebcccd1;border-radius:3px;padding: 20px 20px 10px;margin: 1em 0;">
+<h2 style="color:#a94442;margin-top:0;">Warning! 2015-12-03</h2>
+<p>This package is VERY new and has NOT been fully tested. USE AT YOUR OWN RISK!</p>
+<p>I will remove this warning after I've tested it a bit more. Please feel free to try it out, but I'd strongly recommend doing it in a testing or staging environment. I'd love feedback. Please <a href="/morphatic/laravel-auto-deploy/issues">submit issues here</a>.</p>
+</div>
+
 This package will add push-to-deploy functionality to your Laravel 5.1 project. This means, that whenever you push changes to your project's Github repository, a secure notification will be sent to your server which will initiate a sequence of commands to:
 
 1. Create a snapshot of your project database
