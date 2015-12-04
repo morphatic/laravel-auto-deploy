@@ -1,20 +1,21 @@
 # Laravel Auto-Deploy
 
-[![Build Status](https://travis-ci.org/morphatic/laravel-auto-deploy.svg?branch=master)](https://travis-ci.org/morphatic/laravel-auto-deploy) [![Coverage Status](https://coveralls.io/repos/morphatic/laravel-auto-deploy/badge.svg?branch=master&service=github)](https://coveralls.io/github/morphatic/laravel-auto-deploy?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/morphatic/laravel-auto-deploy/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/morphatic/laravel-auto-deploy/?branch=master) [![Dependency Status](https://www.versioneye.com/user/projects/565e842cf376cc003c000001/badge.svg?style=flat)](https://www.versioneye.com/user/projects/565e842cf376cc003c000001)
+[![Build Status](https://travis-ci.org/morphatic/laravel-auto-deploy.svg?branch=master)](https://travis-ci.org/morphatic/laravel-auto-deploy) [![Coverage Status](https://coveralls.io/repos/morphatic/laravel-auto-deploy/badge.svg?branch=master&service=github)](https://coveralls.io/github/morphatic/laravel-auto-deploy?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/morphatic/laravel-auto-deploy/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/morphatic/laravel-auto-deploy/?branch=master) [![Dependency Status](https://www.versioneye.com/user/projects/565e842cf376cc003c000001/badge.svg?style=flat)](https://www.versioneye.com/user/projects/565e842cf376cc003c000001) [![Latest Stable Version](https://poser.pugx.org/morphatic/laravel-auto-deploy/v/stable)](https://packagist.org/packages/morphatic/laravel-auto-deploy) [![Total Downloads](https://poser.pugx.org/morphatic/laravel-auto-deploy/downloads)](https://packagist.org/packages/morphatic/laravel-auto-deploy) [![Latest Unstable Version](https://poser.pugx.org/morphatic/laravel-auto-deploy/v/unstable)](https://packagist.org/packages/morphatic/laravel-auto-deploy) [![License](https://poser.pugx.org/morphatic/laravel-auto-deploy/license)](https://packagist.org/packages/morphatic/laravel-auto-deploy)
 
 This package will add push-to-deploy functionality to your Laravel 5.1 project. This means, that whenever you push changes to your project's Github repository, a secure notification will be sent to your server which will initiate a sequence of commands to:
 
 1. Create a snapshot of your project database
-2. Stash any local edits you had made to the project on the server
+2. Create a new deploy folder next to your existing one
 3. Pull the latest commit from your Github repo to your server
-4. Run `composer self-update && composer update`
-5. Run `npm update && gulp`
-6. Run `php artisan migrate`
-7. Update any newly created/updated files so the web server has access to them
-8. Log all changes
-9. Abort and roll back any changes in the event of an error
-10. Send a notification to the site admin
-11. Do all of the above immediately, or at a set time, say 2AM when few people are likely to be using your app
+4. Copy your `.env` file over from the latest version
+5. Run `composer self-update && composer update`
+6. Run `npm update`
+7. Run `php artisan migrate`
+8. Seed your database
+9. Symlink the new deploy directory to be your webroot
+10. Log all changes and send you an email
+11. Abort and roll back any changes in the event of an error
+12. Do all of the above immediately, (in the future) or at a set time, say 2AM when few people are likely to be using your app
 
 In other words, it will automatically execute all the steps you would normally perform manually when deploying changes to a live website. Most of the steps are configurable, and a number are optional. The idea is to create one or more automatic deployment scripts that will fit various scenarios for your project.
 
@@ -22,7 +23,7 @@ In other words, it will automatically execute all the steps you would normally p
 
 ### Pre-requisites
 
-This package is designed to work with Laravel 5.1 and has not been tested with other versions. It is **strongly recommended** that you set up an SSL certificate for your site so that Github can send requests securely. It is possible to use a self-signed certificate by clicking on the "Disable SSL verification" button when setting up the webhook at Github. That being said, getting an SSL certificate from a registered CA is highly recommended.
+This package is designed to work with Laravel 5.1 and has not been tested with other versions. It has only been tested in an Ubuntu 14.04 (Trusty)/Nginx setup. It is **strongly recommended** that you set up an SSL certificate for your site so that Github can send requests securely. If you don't have an SSL cert, [**you can get one for free at Let's Encrypt!**](https://letsencrypt.org) It is possible to use a self-signed certificate with Github webhooks by clicking on the "Disable SSL verification" button when setting up the webhook. That being said, getting an SSL certificate from a registered CA is highly recommended. Since they're free now, you really have no excuse!
 
 <a name="step1"></a>
 ### Step 1: Modify `composer.json`
@@ -33,7 +34,7 @@ You have two options. The first option is to open the `composer.json` file in th
 "morphatic/laravel-auto-deploy": "dev-master"
 ```
 
-After doing this, open up a terminal session (command prompt), navigate to the root of your project, and type `composer update`. This will install 
+After doing this, open up a terminal session (command prompt), navigate to the root of your project, and type `composer update`. This will install the package in your vendor folder.
 
 The second option is to open up a terminal session, navigate to the root of your project and type the command:
 
