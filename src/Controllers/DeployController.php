@@ -101,15 +101,17 @@ class DeployController extends Controller
         $steps = config("$configKey.steps");
 
         // set up logging to email
-        $domain = parse_url(config('app.url'), PHP_URL_HOST);
-        $msg = \Swift_Message::newInstance('Project Deployed')
-                ->setFrom(["do_not_reply@$domain" => 'Laravel Auto-Deploy[$domain]'])
-                ->setTo(config('auto-deploy.notify'))
-                ->setBody('', 'text/html');
-        $handler = new SwiftMailerHandler(Mail::getSwiftMailer(), $msg, Logger::NOTICE);
-        $handler->setFormatter(new HtmlFormatter());
         $this->log = Log::getMonolog();
-        $this->log->pushHandler($handler);
+        if ($to = config('auto-deploy.notify')) {
+            $domain = parse_url(config('app.url'), PHP_URL_HOST);
+            $msg = \Swift_Message::newInstance('Project Deployed')
+                    ->setFrom(["do_not_reply@$domain" => 'Laravel Auto-Deploy[$domain]'])
+                    ->setTo($to)
+                    ->setBody('', 'text/html');
+            $handler = new SwiftMailerHandler(Mail::getSwiftMailer(), $msg, Logger::NOTICE);
+            $handler->setFormatter(new HtmlFormatter());
+            $this->log->pushHandler($handler);
+        }
 
         // execute the configured steps
         $this->result = [
@@ -117,7 +119,7 @@ class DeployController extends Controller
             'Timestamp' => date('r'),
             'output' => '',
         ];
-        $whitelist = ['backupDatabase','pull','composer','npm','migrate','seed','deploy'];
+        $whitelist = ['backupDatabase','pull','copyEnv','composer','npm','migrate','seed','deploy'];
         foreach ($steps as $step) {
             if (in_array($step, $whitelist) && !$this->{$step}()) {
                 $this->log->error('Deploy failed.', $this->result);
@@ -224,6 +226,20 @@ class DeployController extends Controller
         }
 
         return false;
+    }
+
+    /**
+     * Copy the .env file from the new deploy directory.
+     *
+     * @return bool True if the update is successful. False otherwise.
+     */
+    private function copyEnv()
+    {
+        $cmd = new Command('cp');
+        $cmd->addParam($this->webroot.'./env')
+            ->addParam($this->installDir.'/.env');
+
+        return $this->ex($cmd);
     }
 
     /**

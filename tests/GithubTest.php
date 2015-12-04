@@ -60,7 +60,7 @@ class GithubTest extends TestCase
 
     public function testVerifiedGithubRequest()
     {
-        App::instance('AdamBrett\ShellWrapper\Runners\Exec', $this->getExec(9));
+        App::instance('AdamBrett\ShellWrapper\Runners\Exec', $this->getExec(10));
         $secret = 'sha1='.hash_hmac('sha1', 'hello', config('auto-deploy.secret'));
         $server = [
             'HTTP_User-Agent' => 'GitHub-Hookshot 12345',

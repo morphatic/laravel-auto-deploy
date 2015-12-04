@@ -31,8 +31,9 @@ class DeployInitCommand extends Command
         // Set necessary variables
         $path = base_path('.env');
         $url = parse_url(config('app.url'), PHP_URL_HOST);
+        $ssl = config('auto-deploy.require-ssl') ? 'https' : 'http';
         $msg = "Here is the information you'll need to set up your webhooks:\n\n".
-               "  Payload URL: <comment>https://$url/%s</comment>\n".
+               "  Payload URL: <comment>$ssl://$url/%s</comment>\n".
                "  Secret Key:  <comment>%s</comment>\n\n".
                "You can display this information again by running `php artisan deploy:info`\n";
         $conf = 'Are you sure you want to overwrite the existing keys?';
