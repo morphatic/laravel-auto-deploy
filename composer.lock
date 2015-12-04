@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "506836c92eb390b9e01e90054bfbb33a",
-    "content-hash": "eb58ee5fcf3c1ead465c55f13e1db371",
+    "hash": "06f78f6cc6e16504743b39a0ca702569",
+    "content-hash": "5f33639618dff23edb4e933c948d5342",
     "packages": [
         {
             "name": "adambrett/shell-wrapper",
