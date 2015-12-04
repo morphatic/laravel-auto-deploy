@@ -94,18 +94,12 @@ class DeployController extends Controller
      */
     public function index()
     {
-        // get the parameters for the event we're handling
-        $configKey = "auto-deploy.{$this->origin->name}.{$this->origin->event()}";
-        $this->webroot = config("$configKey.webroot");
-        $this->installDir = dirname($this->webroot).'/'.date('Y-m-d').'_'.$this->commitId;
-        $steps = config("$configKey.steps");
-
         // set up logging to email
         $this->log = Log::getMonolog();
         if ($to = config('auto-deploy.notify')) {
             $domain = parse_url(config('app.url'), PHP_URL_HOST);
             $msg = \Swift_Message::newInstance('Project Deployed')
-                    ->setFrom(["do_not_reply@$domain" => 'Laravel Auto-Deploy[$domain]'])
+                    ->setFrom(["do_not_reply@$domain" => "Laravel Auto-Deploy[$domain]"])
                     ->setTo($to)
                     ->setBody('', 'text/html');
             $handler = new SwiftMailerHandler(Mail::getSwiftMailer(), $msg, Logger::NOTICE);
@@ -113,21 +107,32 @@ class DeployController extends Controller
             $this->log->pushHandler($handler);
         }
 
-        // execute the configured steps
-        $this->result = [
-            'Commit_ID' => $this->commitId,
-            'Timestamp' => date('r'),
-            'output' => '',
-        ];
-        $whitelist = ['backupDatabase','pull','copyEnv','composer','npm','migrate','seed','deploy'];
-        foreach ($steps as $step) {
-            if (in_array($step, $whitelist) && !$this->{$step}()) {
-                $this->log->error('Deploy failed.', $this->result);
+        // check to see if we should execute this event
+        if (in_array($this->origin->event(), array_keys(config("auto-deploy.{$this->origin->name}")))) {
+            // get the parameters for the event we're handling
+            $configKey = "auto-deploy.{$this->origin->name}.{$this->origin->event()}";
+            $this->webroot = config("$configKey.webroot");
+            $this->installDir = dirname($this->webroot).'/'.date('Y-m-d').'_'.$this->commitId;
+            $steps = config("$configKey.steps");
 
-                return;
+            // execute the configured steps
+            $this->result = [
+                'Commit_ID' => $this->commitId,
+                'Timestamp' => date('r'),
+                'output' => '',
+            ];
+            $whitelist = ['backupDatabase','pull','copyEnv','composer','npm','migrate','seed','deploy'];
+            foreach ($steps as $step) {
+                if (in_array($step, $whitelist) && !$this->{$step}()) {
+                    $this->log->error('Deploy failed.', $this->result);
+
+                    return;
+                }
             }
+            $this->log->notice('Deploy succeeded!', $this->result);
+        } else {
+            $this->log->error('Deploy failed.', ['Reason' => 'This event was not configured.']);
         }
-        $this->log->notice('Deploy succeeded!', $this->result);
     }
 
     /**
